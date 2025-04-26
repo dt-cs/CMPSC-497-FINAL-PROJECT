@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Learning Curve: Three Epochs Comparison</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: white;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .charts-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .chart-wrapper {
+      height: 400px;
+      position: relative;
+    }
+    .metrics-container {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+    .metrics-title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 10px 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .epoch1 {
+      color: #4285f4;
+    }
+    .epoch2 {
+      color: #ea4335;
+    }
+    .epoch3 {
+      color: #34a853;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Learning Curve: Three Epochs Comparison</h1>
+    
+    <div class="charts-container">
+      <div class="chart-wrapper">
+        <canvas id="combinedChart"></canvas>
+      </div>
+      
+      <div class="chart-wrapper">
+        <canvas id="normalizedChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="metrics-container">
+      <h2 class="metrics-title">Epoch Statistics Comparison</h2>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="epoch1">Epoch 1 (Steps 1-156)</th>
+            <th class="epoch2">Epoch 2 (Steps 157-312)</th>
+            <th class="epoch3">Epoch 3 (Steps 313-468)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Starting Loss</td>
+            <td class="epoch1">1.895</td>
+            <td class="epoch2">0.327</td>
+            <td class="epoch3">0.210</td>
+          </tr>
+          <tr>
+            <td>Ending Loss</td>
+            <td class="epoch1">0.502</td>
+            <td class="epoch2">0.343</td>
+            <td class="epoch3">0.161</td>
+          </tr>
+          <tr>
+            <td>Mean Loss</td>
+            <td class="epoch1">0.642</td>
+            <td class="epoch2">0.317</td>
+            <td class="epoch3">0.187</td>
+          </tr>
+          <tr>
+            <td>Minimum Loss</td>
+            <td class="epoch1">0.331 (Step 58)</td>
+            <td class="epoch2">0.117 (Step 188)</td>
+            <td class="epoch3">0.087 (Step 423)</td>
+          </tr>
+          <tr>
+            <td>Loss Reduction</td>
+            <td class="epoch1">73.5%</td>
+            <td class="epoch2">-4.9%</td>
+            <td class="epoch3">23.3%</td>
+          </tr>
+          <tr>
+            <td>Standard Deviation</td>
+            <td class="epoch1">0.239</td>
+            <td class="epoch2">0.054</td>
+            <td class="epoch3">0.038</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h3>Key Observations:</h3>
+      <ul>
+        <li><strong>Epoch 1</strong>: Shows rapid initial learning with high variability, achieving a 73.5% reduction in loss.</li>
+        <li><strong>Epoch 2</strong>: Demonstrates more stability with lower variability. Interestingly, ending loss is slightly higher than starting loss for this epoch, but contains the lowest individual loss value up to this point (0.117).</li>
+        <li><strong>Epoch 3</strong>: Shows further refinement with the most stable learning (lowest standard deviation) and achieves the overall minimum loss of 0.087 at step 423.</li>
+        <li><strong>Overall Improvement</strong>: 91.5% reduction in loss from step 1 (1.895) to step 468 (0.161).</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Parse the training loss data
+    const rawData = `1	1.895200
+2	1.123100
+3	1.198100
+4	1.249600
+5	1.067100
+6	0.924300
+7	0.767200
+8	0.876900
+9	0.863300
+10	0.829000
+11	0.733600
+12	0.762400
+13	0.640200
+14	0.862200
+15	0.691100
+16	0.772200
+17	0.739900
+18	0.602000
+19	0.552200
+20	0.651100
+21	0.567600
+22	0.493900
+23	0.614000
+24	0.581200
+25	0.564600
+26	0.668000
+27	0.551200
+28	0.461600
+29	0.578200
+30	0.408700
+31	0.621500
+32	0.581100
+33	0.385400
+34	0.580300
+35	0.508400
+36	0.543700
+37	0.404100
+38	0.566700
+39	0.510700
+40	0.546200
+41	0.470200
+42	0.533500
+43	0.481800
+44	0.495400
+45	0.533400
+46	0.490600
+47	0.477300
+48	0.403600
+49	0.496800
+50	0.566300
+51	0.458000
+52	0.527000
+53	0.526300
+54	0.558300
+55	0.522700
+56	0.454600
+57	0.480100
+58	0.331600
+59	0.566900
+60	0.471200
+61	0.660400
+62	0.456000
+63	0.412300
+64	0.517600
+65	0.321000
+66	0.453800
+67	0.512700
+68	0.476300
+69	0.514100
+70	0.524200
+71	0.469800
+72	0.415600
+73	0.342200
+74	0.450500
+75	0.506300
+76	0.466800
+77	0.441400
+78	0.437700
+79	0.473200
+80	0.281600
+81	0.403600
+82	0.444500
+83	0.437100
+84	0.421200
+85	0.485600
+86	0.450100
+87	0.413200
+88	0.524900
+89	0.389300
+90	0.541500
+91	0.430200
+92	0.425700
+93	0.447900
+94	0.485700
+95	0.512000
+96	0.504100
+97	0.466000
+98	0.465100
+99	0.509000
+100	0.344800
+101	0.387200
+102	0.435300
+103	0.324800
+104	0.480900
+105	0.396300
+106	0.408100
+107	0.382800
+108	0.412400
+109	0.472700
+110	0.386900
+111	0.479500
+112	0.460800
+113	0.411400
+114	0.438100
+115	0.447100
+116	0.412700
+117	0.490500
+118	0.472100
+119	0.437300
+120	0.479600
+121	0.458400
+122	0.443900
+123	0.419500
+124	0.413700
+125	0.426900
+126	0.468000
+127	0.450500
+128	0.443300
+129	0.384400
+130	0.478900
+131	0.463200
+132	0.477900
+133	0.390800
+134	0.362500
+135	0.439000
+136	0.464800
+137	0.413400
+138	0.468000
+139	0.398100
+140	0.430400
+141	0.373400
+142	0.422200
+143	0.372900
+144	0.485100
+145	0.454600
+146	0.379800
+147	0.447800
+148	0.395400
+149	0.511600
+150	0.277600
+151	0.412100
+152	0.399900
+153	0.455400
+154	0.410200
+155	0.433700
+156	0.502400
+157	0.326500
+158	0.250700
+159	0.341000
+160	0.286700
+161	0.350100
+162	0.310700
+163	0.334500
+164	0.302500
+165	0.458200
+166	0.252000
+167	0.306000
+168	0.369700
+169	0.350200
+170	0.339800
+171	0.238700
+172	0.370600
+173	0.353500
+174	0.310400
+175	0.309300
+176	0.342600
+177	0.333500
+178	0.318700
+179	0.312000
+180	0.314700
+181	0.239700
+182	0.319800
+183	0.426900
+184	0.258300
+185	0.182000
+186	0.309500
+187	0.267800
+188	0.117500
+189	0.278500
+190	0.327500
+191	0.261200
+192	0.316600
+193	0.307500
+194	0.282400
+195	0.365100
+196	0.400800
+197	0.235800
+198	0.292800
+199	0.300100
+200	0.260800
+201	0.313900
+202	0.319400
+203	0.366400
+204	0.315700
+205	0.252700
+206	0.349300
+207	0.267800
+208	0.404800
+209	0.356300
+210	0.342100
+211	0.240000
+212	0.201900
+213	0.342900
+214	0.269400
+215	0.347400
+216	0.228500
+217	0.284900
+218	0.306000
+219	0.293200
+220	0.264500
+221	0.267700
+222	0.385500
+223	0.379500
+224	0.367400
+225	0.368800
+226	0.314200
+227	0.314900
+228	0.325800
+229	0.234100
+230	0.343100
+231	0.358500
+232	0.315600
+233	0.253400
+234	0.349800
+235	0.330700
+236	0.409900
+237	0.282400
+238	0.333700
+239	0.326800
+240	0.340800
+241	0.330800
+242	0.274300
+243	0.318800
+244	0.330400
+245	0.264300
+246	0.337400
+247	0.328100
+248	0.323200
+249	0.205300
+250	0.266200
+251	0.241400
+252	0.290600
+253	0.253400
+254	0.344000
+255	0.352300
+256	0.238300
+257	0.271900
+258	0.299700
+259	0.361600
+260	0.291200
+261	0.357400
+262	0.359800
+263	0.264900
+264	0.296300
+265	0.354800
+266	0.427100
+267	0.279100
+268	0.307300
+269	0.313400
+270	0.275900
+271	0.308100
+272	0.362900
+273	0.259600
+274	0.418400
+275	0.329800
+276	0.126000
+277	0.268000
+278	0.261800
+279	0.376200
+280	0.257400
+281	0.316300
+282	0.326600
+283	0.301900
+284	0.295800
+285	0.296900
+286	0.330200
+287	0.313200
+288	0.354800
+289	0.285400
+290	0.276100
+291	0.339900
+292	0.312800
+293	0.301300
+294	0.288400
+295	0.307800
+296	0.316000
+297	0.269600
+298	0.343800
+299	0.324700
+300	0.307000
+301	0.287600
+302	0.330500
+303	0.291500
+304	0.343100
+305	0.344600
+306	0.170000
+307	0.326300
+308	0.283800
+309	0.297000
+310	0.292000
+311	0.219600
+312	0.343300
+313	0.210100
+314	0.238100
+315	0.137400
+316	0.217800
+317	0.216700
+318	0.211800
+319	0.176400
+320	0.208300
+321	0.232700
+322	0.228700
+323	0.239000
+324	0.244200
+325	0.228000
+326	0.205500
+327	0.160900
+328	0.234000
+329	0.220600
+330	0.179200
+331	0.202000
+332	0.210700
+333	0.244800
+334	0.174800
+335	0.228400
+336	0.187500
+337	0.135900
+338	0.174800
+339	0.204600
+340	0.198200
+341	0.199700
+342	0.242900
+343	0.160700
+344	0.154000
+345	0.195000
+346	0.188100
+347	0.179800
+348	0.172300
+349	0.176900
+350	0.224600
+351	0.184600
+352	0.186000
+353	0.150600
+354	0.250000
+355	0.235400
+356	0.223200
+357	0.152600
+358	0.280700
+359	0.124900
+360	0.239500
+361	0.175000
+362	0.227200
+363	0.151200
+364	0.214800
+365	0.183900
+366	0.195600
+367	0.186100
+368	0.260400
+369	0.102500
+370	0.154300
+371	0.142500
+372	0.149300
+373	0.227800
+374	0.125200
+375	0.194300
+376	0.124500
+377	0.177500
+378	0.173500
+379	0.179500
+380	0.212700
+381	0.176600
+382	0.223500
+383	0.158900
+384	0.197000
+385	0.186000
+386	0.134600
+387	0.205000
+388	0.099000
+389	0.118500
+390	0.098000
+391	0.193700
+392	0.176100
+393	0.226700
+394	0.193600
+395	0.231700
+396	0.158400
+397	0.177600
+398	0.160800
+399	0.143200
+400	0.222100
+401	0.188100
+402	0.187800
+403	0.149200
+404	0.146600
+405	0.101700
+406	0.196300
+407	0.147800
+408	0.205800
+409	0.184000
+410	0.182800
+411	0.148900
+412	0.147300
+413	0.173500
+414	0.159700
+415	0.138600
+416	0.129500
+417	0.155000
+418	0.216400
+419	0.234700
+420	0.217000
+421	0.205400
+422	0.128000
+423	0.086600
+424	0.227600
+425	0.272000
+426	0.187400
+427	0.223400
+428	0.198500
+429	0.186300
+430	0.175400
+431	0.126500
+432	0.171300
+433	0.172000
+434	0.173500
+435	0.156900
+436	0.233000
+437	0.188800
+438	0.198100
+439	0.186800
+440	0.197100
+441	0.194200
+442	0.132300
+443	0.174600
+444	0.216500
+445	0.161400
+446	0.231000
+447	0.206000
+448	0.160100
+449	0.210500
+450	0.219000
+451	0.139200
+452	0.200600
+453	0.244400
+454	0.183500
+455	0.216400
+456	0.182200
+457	0.168800
+458	0.179600
+459	0.128400
+460	0.191400
+461	0.190600
+462	0.147900
+463	0.148300
+464	0.173000
+465	0.168800
+466	0.199300
+467	0.145600
+468	0.160800`;
+
+    const data = rawData.split('\n').map(line => {
+        const [step, loss] = line.split('\t');
+        return {
+            step: parseInt(step),
+            loss: parseFloat(loss)
+        };
+    });
+
+    // Divide data into three epochs
+    const epochSize = Math.ceil(data.length / 3);
+    const epoch1Data = data.slice(0, epochSize);
+    const epoch2Data = data.slice(epochSize, 2 * epochSize);
+    const epoch3Data = data.slice(2 * epochSize);
+    
+    // Calculate statistics for each epoch
+    const calculateEpochStats = (epochData) => {
+        const losses = epochData.map(d => d.loss);
+        const mean = losses.reduce((sum, val) => sum + val, 0) / losses.length;
+        const variance = losses.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / losses.length;
+        const stdDev = Math.sqrt(variance);
+        const min = Math.min(...losses);
+        const minStep = epochData.find(d => d.loss === min).step;
+        
+        return {
+            start: epochData[0].loss,
+            end: epochData[epochData.length - 1].loss,
+            mean,
+            min,
+            minStep,
+            reduction: (1 - (epochData[epochData.length - 1].loss / epochData[0].loss)) * 100,
+            stdDev
+        };
+    };
+    
+    const epoch1Stats = calculateEpochStats(epoch1Data);
+    const epoch2Stats = calculateEpochStats(epoch2Data);
+    const epoch3Stats = calculateEpochStats(epoch3Data);
+    
+    // Normalize steps for comparison chart (0 to epochSize-1 for all)
+    const normalizedEpoch1 = epoch1Data.map((d, i) => ({ step: i, loss: d.loss }));
+    const normalizedEpoch2 = epoch2Data.map((d, i) => ({ step: i, loss: d.loss }));
+    const normalizedEpoch3 = epoch3Data.map((d, i) => ({ step: i, loss: d.loss }));
+    
+    // Get context for the combined chart
+    const ctxCombined = document.getElementById('combinedChart').getContext('2d');
+    
+    // Create the combined chart
+    const combinedChart = new Chart(ctxCombined, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.step),
+            datasets: [{
+                label: 'Training Loss',
+                data: data.map(d => d.loss),
+                borderWidth: 1.5,
+                pointRadius: 0,
+                borderColor: function(context) {
+                    const index = context.dataIndex;
+                    if (index < epochSize) return '#4285f4'; // Epoch 1
+                    if (index < 2 * epochSize) return '#ea4335'; // Epoch 2
+                    return '#34a853'; // Epoch 3
+                },
+                segment: {
+                    borderColor: function(context) {
+                        return context.p0.parsed.x < epochSize && context.p1.parsed.x >= epochSize || 
+                               context.p0.parsed.x < 2 * epochSize && context.p1.parsed.x >= 2 * epochSize 
+                               ? 'rgba(0, 0, 0, 0)' // make the line connecting epochs transparent
+                               : undefined;
+                    }
+                },
+                pointBackgroundColor: function(context) {
+                    const index = context.dataIndex;
+                    
+                    // Highlight specific points
+                    if (index === 0) return '#4285f4'; // First point
+                    if (index === epochSize) return '#ea4335'; // Start of epoch 2
+                    if (index === 2 * epochSize) return '#34a853'; // Start of epoch 3
+                    
+                    // Highlight min points in each epoch
+                    if (index < epochSize && data[index].loss === epoch1Stats.min) return '#4285f4';
+                    if (index >= epochSize && index < 2 * epochSize && data[index].loss === epoch2Stats.min) return '#ea4335';
+                    if (index >= 2 * epochSize && data[index].loss === epoch3Stats.min) return '#34a853';
+                    
+                    // Regular points
+                    if (index < epochSize) return '#4285f4';
+                    if (index < 2 * epochSize) return '#ea4335';
+                    return '#34a853';
+                },
+                pointRadius: function(context) {
+                    const index = context.dataIndex;
+                    
+                    // Make specific points larger
+                    if (index === 0 || index === epochSize || index === 2 * epochSize) return 5;
+                    
+                    // Highlight min points in each epoch
+                    if (index < epochSize && data[index].loss === epoch1Stats.min) return 5;
+                    if (index >= epochSize && index < 2 * epochSize && data[index].loss === epoch2Stats.min) return 5;
+                    if (index >= 2 * epochSize && data[index].loss === epoch3Stats.min) return 5;
+                    
+                    return 0; // Hide regular points
+                },
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Overall Training Loss Across Three Epochs',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const stepNum = parseInt(context[0].label);
+                            let epochNum;
+                            if (stepNum <= epochSize) epochNum = 1;
+                            else if (stepNum <= 2 * epochSize) epochNum = 2;
+                            else epochNum = 3;
+                            
+                            return `Step: ${stepNum} (Epoch ${epochNum})`;
+                        },
+                        label: function(context) {
+                            return `Loss: ${context.parsed.y.toFixed(4)}`;
+                        },
+                        afterLabel: function(context) {
+                            const index = context.dataIndex;
+                            
+                            if (index === 0) return 'Starting point';
+                            if (index === epochSize) return 'Start of Epoch 2';
+                            if (index === 2 * epochSize) return 'Start of Epoch 3';
+                            
+                            if (index < epochSize && data[index].loss === epoch1Stats.min) return 'Lowest in Epoch 1';
+                            if (index >= epochSize && index < 2 * epochSize && data[index].loss === epoch2Stats.min) return 'Lowest in Epoch 2';
+                            if (index >= 2 * epochSize && data[index].loss === epoch3Stats.min) return 'Lowest in Epoch 3';
+                            
+                            return '';
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Training Steps',
+                        font: {
+                            size: 14
+                        }
+                    },
+                    ticks: {
+                        maxTicksLimit: 15
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Training Loss',
+                        font: {
+                            size: 14
+                        }
+                    },
+                    min: 0
+                }
+            },
+            annotation: {
+                annotations: [
+                    {
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x',
+                        value: epochSize,
+                        borderColor: 'rgba(0, 0, 0, 0.3)',
+                        borderWidth: 2,
+                        borderDash: [6, 6],
+                        label: {
+                            content: 'Epoch 2 Start',
+                            enabled: true,
+                            position: 'top'
+                        }
+                    },
+                    {
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x',
+                        value: 2 * epochSize,
+                        borderColor: 'rgba(0, 0, 0, 0.3)',
+                        borderWidth: 2,
+                        borderDash: [6, 6],
+                        label: {
+                            content: 'Epoch 3 Start',
+                            enabled: true,
+                            position: 'top'
+                        }
+                    }
+                ]
+            }
+        }
+    });
+    
+    // Get context for the normalized chart
+    const ctxNormalized = document.getElementById('normalizedChart').getContext('2d');
+    
+    // Create the normalized chart
+    const normalizedChart = new Chart(ctxNormalized, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: epochSize}, (_, i) => i),
+            datasets: [
+                {
+                    label: 'Epoch 1',
+                    data: normalizedEpoch1.map(d => d.loss),
+                    borderColor: '#4285f4',
+                    backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'Epoch 2',
+                    data: normalizedEpoch2.map(d => d.loss),
+                    borderColor: '#ea4335',
+                    backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'Epoch 3',
+                    data: normalizedEpoch3.map(d => d.loss),
+                    borderColor: '#34a853',
+                    backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Normalized Comparison of Epochs (Same Step Scale)',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const relativeStep = parseInt(context[0].label);
+                            const epochIndex = context[0].datasetIndex;
+                            const actualStep = relativeStep + 1 + (epochIndex * epochSize);
+                            
+                            return `Step: ${actualStep} (Epoch ${epochIndex + 1}, Relative Step: ${relativeStep})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Relative Step Within Epoch',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Training Loss',
+                        font: {
+                            size: 14
+                        }
+                    },
+                    min: 0
+                }
+            }
+        }
+    });
+  </script>
+</body>
+</html>
