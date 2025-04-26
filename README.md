@@ -122,3 +122,14 @@ if curve_path and circle_profile:
 else:
     rs.MessageBox("Please select both a curve path and a circle profile.")
 ```
+### 6. Discussion and Future Work
+
+The analysis of the learning curve shows that the fine-tuned model has successfully learned to interpret natural language instructions for 3D modeling operations. The model demonstrates competency in parsing user inputs, decomposing complex modeling tasks into logical steps, creating pseudocode representations, and identifying appropriate function signatures within the Rhinoceros Python API. The significant reduction in training loss across both epochs (69.0% overall) indicates effective adaptation to the domain-specific task.
+However, the model still exhibits limitations in its function generation capabilities. Specifically, it occasionally produces functions that do not exist within the RhinoPython library ecosystem, creating theoretically sound but practically non-executable code. This discrepancy highlights a gap between the model's general code generation abilities and its domain-specific knowledge of the Rhinoceros Python API constraints.
+To address this limitation, implementing Direct Preference Optimization (DPO) as the next refinement stage could substantially improve performance. DPO represents an advancement over traditional reinforcement learning from human feedback methods by directly optimizing the preference gap between desired and undesired outputs without requiring an explicit reward model. The implementation would involve:
+
+Generating paired samples of responses (correct RhinoPython functions vs. invalid functions) for identical user queries
+1.Formulating a preference dataset where valid RhinoPython API implementations are preferred over invalid ones
+2.Optimizing the model to maximize the likelihood gap between preferred and non-preferred responses
+
+This approach would effectively penalize the model for generating non-existent functions while reinforcing the use of valid RhinoPython API calls.
