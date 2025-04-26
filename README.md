@@ -80,6 +80,8 @@ LoRA introduces additional trainable low-rank matrices into specific layers of t
 
 This approach significantly reduces training time, mitigates catastrophic forgetting, and facilitates efficient fine-tuning across different tasks. The number of training epochs will be determined based on validation performance and available computational resources.
 
+![Learning Curve 02](learning%20curve/learning%20curve%2002.PNG)
+
 ### 5.3 Sample response for a query
 
 create a circle along a curve
