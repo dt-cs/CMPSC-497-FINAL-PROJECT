@@ -87,7 +87,7 @@ This approach significantly reduces training time, mitigates catastrophic forget
 ## Epoch 1 vs Epoch 2
 View the comparison between Epoch 1 and Epoch 2 [here](https://dt-cs.github.io/CMPSC-497-FINAL-PROJECT/learning-curve-comparison.html).
 
-## Three Epochs Comparison
+## Epoch 1 vs Epoch 2 vs Epoch 3
 View the detailed comparison of three epochs [here](https://dt-cs.github.io/CMPSC-497-FINAL-PROJECT/three-epochs-comparison.html).
 
 ### 5.3 Sample response for a query
