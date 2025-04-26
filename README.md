@@ -82,6 +82,14 @@ This approach significantly reduces training time, mitigates catastrophic forget
 
 ![Learning Curve 02](learning%20curve/learning%20curve%2002.PNG)
 
+# Learning Curve Analysis
+
+## Epoch 1 vs Epoch 2
+View the comparison between Epoch 1 and Epoch 2 [here](https://dt-cs.github.io/CMPSC-497-FINAL-PROJECT/learning-curve-comparison.html).
+
+## Three Epochs Comparison
+View the detailed comparison of three epochs [here](https://dt-cs.github.io/CMPSC-497-FINAL-PROJECT/three-epochs-comparison.html).
+
 ### 5.3 Sample response for a query
 
 create a circle along a curve
