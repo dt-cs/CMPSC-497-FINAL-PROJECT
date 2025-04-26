@@ -53,6 +53,16 @@ For each synthetic query, a corresponding Python script is generated to serve as
 
 The final dataset is formatted in a conversational structure consistent with OpenAI's fine-tuning data specifications. This formatting enables the dataset to be directly utilized for supervised instruction fine-tuning. The dataset will be uploaded to the Hugging Face Hub for version control and subsequent access during model training.
 
+```json
+{
+    "example": "Grid of Points in 3D Space",
+    "instruction": "Generate a uniform 3D grid of points within a bounding box.",
+    "reasoning": "Understanding spatial divisions helps lay the groundwork for any parametric modeling process.",
+    "pseudocode": "1. Define bounding box dimensions (x_max, y_max, z_max).\n2. Set spacing interval (dx, dy, dz).\n3. For x in range(0, x_max, dx):\n  For y in range(0, y_max, dy):\n    For z in range(0, z_max, dz):\n      Place point at (x, y, z).",
+    "python_procedural_algorithm": "\nimport rhinoscriptsyntax as rs\n# Request bounding box dimensions and spacing from user\nx_max = rs.GetReal('Enter bounding box X size')\ny_max = rs.GetReal('Enter bounding box Y size')\nz_max = rs.GetReal('Enter bounding box Z size')\ndx = rs.GetReal('Enter X spacing')\ndy = rs.GetReal('Enter Y spacing')\ndz = rs.GetReal('Enter Z spacing')\n# Use nested loops to iterate through the bounding box and add points\nx = 0.0\nwhile x <= x_max:\n    y = 0.0\n    while y <= y_max:\n        z = 0.0\n        while z <= z_max:\n            rs.AddPoint((x, y, z))  # Add a point at each grid location\n            z += dz\n        y += dy\n    x += dx\n"
+  }
+```
+
 ## 5. Supervised Fine-Tuning (SFT)
 
 ### 5.1 Model Selection
