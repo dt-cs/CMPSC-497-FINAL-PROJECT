@@ -129,7 +129,7 @@ However, the model still exhibits limitations in its function generation capabil
 To address this limitation, implementing Direct Preference Optimization (DPO) as the next refinement stage could substantially improve performance. DPO represents an advancement over traditional reinforcement learning from human feedback methods by directly optimizing the preference gap between desired and undesired outputs without requiring an explicit reward model. The implementation would involve:
 
 Generating paired samples of responses (correct RhinoPython functions vs. invalid functions) for identical user queries
-1.Formulating a preference dataset where valid RhinoPython API implementations are preferred over invalid ones
-2.Optimizing the model to maximize the likelihood gap between preferred and non-preferred responses
+1. Formulating a preference dataset where valid RhinoPython API implementations are preferred over invalid ones
+2. Optimizing the model to maximize the likelihood gap between preferred and non-preferred responses
 
 This approach would effectively penalize the model for generating non-existent functions while reinforcing the use of valid RhinoPython API calls.
